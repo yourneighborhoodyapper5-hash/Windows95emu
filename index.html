@@ -1,32 +1,33 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Windows 95 in v86</title>
-    <script src="libv86.js"></script>
-  </head>
-  <body>
-    <div id="screen_container">
-      <div style="white-space: pre; font: monospace" id="screen"></div>
-    </div>
-    <script>
-      window.onload = function() {
-        window.emulator = new V86({
-          wasm_path: "v86.wasm",
-          memory_size: 128 * 1024 * 1024, // 128MB RAM
-          vga_memory_size: 8 * 1024 * 1024,
-          screen_container: document.getElementById("screen_container"),
-          bios: {
-            url: "seabios.bin",
-          },
-          vga_bios: {
-            url: "vgabios.bin",
-          },
-          hda: {
-            url: "win95.img", // Your Windows 95 disk image
-          },
-          autostart: true,
-        });
-      };
-    </script>
-  </body>
+<head>
+  <title>Windows 95 in v86</title>
+  <script src="libv86.js"></script>
+</head>
+<body>
+  <div id="screen_container">
+    <div style="white-space: pre; font: monospace" id="screen"></div>
+  </div>
+  <script>
+    window.onload = function() {
+      window.emulator = new V86({
+        wasm_path: "v86.wasm",
+        memory_size: 128 * 1024 * 1024,
+        vga_memory_size: 8 * 1024 * 1024,
+        screen_container: document.getElementById("screen_container"),
+        bios: {
+          url: "seabios.bin",
+        },
+        vga_bios: {
+          url: "vgabios.bin",
+        },
+        hda: {
+          url: "win95.img",
+          async: true,
+        },
+        autostart: true,
+      });
+    };
+  </script>
+</body>
 </html>
