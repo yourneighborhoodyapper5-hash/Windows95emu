@@ -2,36 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Windows 95 Emulator — Debug</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 95 Emulator - Debug</title>
     <style>
         * {
             box-sizing: border-box;
         }
-
         html,
         body {
             margin: 0;
             width: 100%;
             height: 100%;
-            background: #111;
+            background: #101010;
             color: #eee;
             font-family: monospace;
             overflow: hidden;
         }
-
         #app {
-            display: flex;
             width: 100%;
             height: 100%;
+            display: flex;
         }
-
-        /* Emulator */
+        /* =========================
+           EMULATOR
+        ========================= */
         #emulator-panel {
             flex: 1;
             min-width: 0;
@@ -39,23 +33,23 @@
             flex-direction: column;
             background: #000;
         }
-
-        #emulator-header {
-            height: 36px;
+        #topbar {
+            height: 38px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             padding: 0 10px;
-            background: #222;
+            background: #202020;
             border-bottom: 1px solid #444;
-            color: #ddd;
-            gap: 12px;
+            font-size: 13px;
         }
-
+        #title {
+            font-weight: bold;
+        }
         #status {
             margin-left: auto;
             color: #aaa;
         }
-
         #screen-container {
             flex: 1;
             display: flex;
@@ -64,110 +58,111 @@
             overflow: auto;
             background: #000;
         }
-
         #screen {
             background: #000;
         }
-
-        /* Debug panel */
+        /* =========================
+           DEBUG PANEL
+        ========================= */
         #debug-panel {
-            width: 420px;
-            max-width: 42%;
+            width: 430px;
+            max-width: 43%;
             display: flex;
             flex-direction: column;
             background: #090909;
             border-left: 1px solid #444;
         }
-
-        #debug-header {
-            height: 36px;
+        #debug-topbar {
+            height: 38px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
-            padding: 0 10px;
-            background: #1d1d1d;
+            padding: 0 8px;
+            background: #202020;
             border-bottom: 1px solid #444;
         }
-
         #debug-title {
             font-weight: bold;
+            font-size: 13px;
         }
-
         #buttons {
             margin-left: auto;
             display: flex;
             gap: 5px;
         }
-
         button {
-            border: 1px solid #555;
             background: #292929;
             color: #eee;
+            border: 1px solid #555;
             padding: 4px 8px;
-            cursor: pointer;
             font-family: monospace;
+            cursor: pointer;
         }
-
         button:hover {
             background: #3a3a3a;
         }
-
+        /* =========================
+           LOG
+        ========================= */
         #logs {
             flex: 1;
             overflow-y: auto;
             padding: 8px;
+            font-size: 12px;
+            line-height: 1.45;
             white-space: pre-wrap;
             word-break: break-word;
-            font-size: 12px;
-            line-height: 1.4;
         }
-
         .log {
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
-
         .info {
             color: #ccc;
         }
-
+        .boot {
+            color: #6db7ff;
+        }
         .success {
             color: #7cff7c;
         }
-
         .warning {
             color: #ffd166;
         }
-
         .error {
-            color: #ff6b6b;
+            color: #ff6666;
         }
-
-        .boot {
-            color: #66b3ff;
+        .serial {
+            color: #aaa;
         }
-
+        /* =========================
+           COMMAND BAR
+        ========================= */
         #command-bar {
-            border-top: 1px solid #444;
-            padding: 6px;
             display: flex;
             gap: 6px;
+            padding: 6px;
+            border-top: 1px solid #444;
         }
-
         #command {
             flex: 1;
             min-width: 0;
+            padding: 6px;
             background: #111;
             color: #fff;
             border: 1px solid #444;
-            padding: 6px;
-            font-family: monospace;
             outline: none;
+            font-family: monospace;
         }
-
+        /* =========================
+           MOBILE
+        ========================= */
         @media (max-width: 800px) {
             #app {
                 flex-direction: column;
             }
-
+            #emulator-panel {
+                height: 60%;
+            }
             #debug-panel {
                 width: 100%;
                 max-width: none;
@@ -175,422 +170,559 @@
                 border-left: none;
                 border-top: 1px solid #444;
             }
-
-            #emulator-panel {
-                height: 60%;
-            }
         }
     </style>
 </head>
-
 <body>
-
 <div id="app">
-
-    <!-- Emulator -->
+    <!-- =========================
+         EMULATOR
+    ========================= -->
     <section id="emulator-panel">
-
-        <div id="emulator-header">
-            <strong>Windows 95 Emulator</strong>
-            <span id="status">INITIALIZING</span>
+        <div id="topbar">
+            <span id="title">
+                Windows 95 Emulator
+            </span>
+            <span id="status">
+                INITIALIZING
+            </span>
         </div>
-
         <div id="screen-container">
             <div id="screen"></div>
         </div>
-
     </section>
-
-    <!-- Debug / Terminal -->
+    <!-- =========================
+         DEBUG
+    ========================= -->
     <section id="debug-panel">
-
-        <div id="debug-header">
-
+        <div id="debug-topbar">
             <span id="debug-title">
                 BOOT / DEBUG OUTPUT
             </span>
-
             <div id="buttons">
-                <button onclick="clearLogs()">CLEAR</button>
-                <button onclick="restartEmulator()">RESTART</button>
+                <button onclick="clearLogs()">
+                    CLEAR
+                </button>
+                <button onclick="restartEmulator()">
+                    RESTART
+                </button>
             </div>
-
         </div>
-
         <div id="logs"></div>
-
         <div id="command-bar">
             <input
                 id="command"
                 type="text"
-                placeholder="Debug command..."
+                placeholder="help / status / restart / clear"
                 autocomplete="off"
             >
-            <button onclick="runCommand()">RUN</button>
+            <button onclick="runCommand()">
+                RUN
+            </button>
         </div>
-
     </section>
-
 </div>
-
-<!-- v86 -->
-<script src="libv86.js"></script>
-
+<!-- =========================
+     V86
+========================= -->
+<script src="./libv86.js"></script>
 <script>
 "use strict";
-
-/*
- * Windows95emu Debug Launcher
- */
-
+/* =====================================================
+   GLOBALS
+===================================================== */
 let emulator = null;
-
-const logs = document.getElementById("logs");
-const statusElement = document.getElementById("status");
-const commandInput = document.getElementById("command");
-
-
-/* --------------------------------------------------
- * Logging
- * -------------------------------------------------- */
-
+const logs =
+    document.getElementById("logs");
+const status =
+    document.getElementById("status");
+const command =
+    document.getElementById("command");
+/* =====================================================
+   LOGGING
+===================================================== */
 function timestamp() {
-    return new Date().toLocaleTimeString();
+    return new Date()
+        .toLocaleTimeString();
 }
-
 function log(message, type = "info") {
-    const line = document.createElement("div");
-
-    line.className = `log ${type}`;
-
-    line.textContent =
-        `[${timestamp()}] ${message}`;
-
-    logs.appendChild(line);
-
-    logs.scrollTop = logs.scrollHeight;
-
-    // Also keep normal browser console output
-    if (type === "error") {
-        console.error(message);
-    } else if (type === "warning") {
-        console.warn(message);
-    } else {
-        console.log(message);
-    }
+    const element =
+        document.createElement("div");
+    element.className =
+        "log " + type;
+    element.textContent =
+        "[" + timestamp() + "] " + message;
+    logs.appendChild(element);
+    logs.scrollTop =
+        logs.scrollHeight;
 }
-
 function clearLogs() {
     logs.innerHTML = "";
-    log("Debug output cleared.");
+    log(
+        "Debug output cleared.",
+        "info"
+    );
 }
-
-
-/* --------------------------------------------------
- * Status
- * -------------------------------------------------- */
-
+/* =====================================================
+   STATUS
+===================================================== */
 function setStatus(text, type = "info") {
-    statusElement.textContent = text;
-
-    statusElement.className = type;
+    status.textContent =
+        text;
+    status.className =
+        type;
 }
-
-
-/* --------------------------------------------------
- * Browser error reporting
- * -------------------------------------------------- */
-
-window.addEventListener("error", event => {
-    log(
-        `JavaScript ERROR: ${event.message} @ ${event.filename}:${event.lineno}`,
-        "error"
-    );
-
-    setStatus("ERROR", "error");
-});
-
-window.addEventListener("unhandledrejection", event => {
-    log(
-        `Unhandled Promise rejection: ${event.reason}`,
-        "error"
-    );
-
-    setStatus("ERROR", "error");
-});
-
-
-/* --------------------------------------------------
- * Emulator startup
- * -------------------------------------------------- */
-
-function startEmulator() {
-
-    log("Starting Windows 95 emulator...", "boot");
-
-    setStatus("STARTING", "boot");
-
-    if (typeof V86Starter === "undefined") {
+/* =====================================================
+   BROWSER ERRORS
+===================================================== */
+window.addEventListener(
+    "error",
+    function(event) {
         log(
-            "V86Starter was not found. Check that libv86.js exists.",
+            "JavaScript ERROR: " +
+            event.message +
+            " @ " +
+            event.filename +
+            ":" +
+            event.lineno,
             "error"
         );
-
-        setStatus("V86 MISSING", "error");
-
+        setStatus(
+            "ERROR",
+            "error"
+        );
+    }
+);
+window.addEventListener(
+    "unhandledrejection",
+    function(event) {
+        log(
+            "Unhandled rejection: " +
+            event.reason,
+            "error"
+        );
+        setStatus(
+            "ERROR",
+            "error"
+        );
+    }
+);
+/* =====================================================
+   SERIAL OUTPUT
+===================================================== */
+let serialBuffer = "";
+function handleSerialByte(byte) {
+    /*
+     * Convert the v86 serial byte
+     * into a character.
+     */
+    const character =
+        String.fromCharCode(byte);
+    /*
+     * Ignore carriage returns.
+     */
+    if (character === "\r") {
         return;
     }
-
-    log("v86 library loaded successfully.", "success");
-
-    try {
-
-        log("Creating emulator instance...", "boot");
-
-        emulator = new V86Starter({
-
-            /* Display */
-            screen_container:
-                document.getElementById("screen"),
-
-            /* BIOS */
-            bios: {
-                url: "seabios.bin"
-            },
-
-            vga_bios: {
-                url: "vgabios.bin"
-            },
-
-            /* Windows 95 disk */
-            hda: {
-                url: "win95.img",
-                async: true
-            },
-
-            /* Memory */
-            memory_size: 128 * 1024 * 1024,
-
-            /* Video */
-            vga_memory_size: 8 * 1024 * 1024,
-
-            /* Start immediately */
-            autostart: true,
-
-            /* Debugging */
-            disable_mouse: false,
-
-            /* Enable serial output */
-            serial_container:
-                document.getElementById("logs")
-
-        });
-
+    /*
+     * New line = print the buffer.
+     */
+    if (character === "\n") {
+        if (serialBuffer.length > 0) {
+            log(
+                "SERIAL: " +
+                serialBuffer,
+                "serial"
+            );
+            serialBuffer = "";
+        }
+        return;
+    }
+    serialBuffer += character;
+    /*
+     * Prevent an enormous line
+     * from filling the browser.
+     */
+    if (serialBuffer.length > 500) {
         log(
-            "V86 emulator object created.",
-            "success"
+            "SERIAL: " +
+            serialBuffer,
+            "serial"
         );
-
-        setStatus("BOOTING", "boot");
-
-        /*
-         * v86 events
-         */
-
-        emulator.add_listener("emulator-ready", () => {
-
-            log(
-                "v86 reports emulator-ready.",
-                "success"
-            );
-
-            setStatus("READY", "success");
-
-        });
-
-        emulator.add_listener("emulator-started", () => {
-
-            log(
-                "Emulator started.",
-                "success"
-            );
-
-            setStatus("RUNNING", "success");
-
-        });
-
-        emulator.add_listener("emulator-stopped", () => {
-
-            log(
-                "Emulator stopped.",
-                "warning"
-            );
-
-            setStatus("STOPPED", "warning");
-
-        });
-
-        emulator.add_listener("download-progress", event => {
-
-            if (!event) return;
-
-            const loaded =
-                event.loaded || 0;
-
-            const total =
-                event.total || 0;
-
-            if (total > 0) {
-
-                const percent =
-                    ((loaded / total) * 100).toFixed(1);
-
-                log(
-                    `Disk download: ${percent}%`,
-                    "boot"
-                );
-            }
-
-        });
-
+        serialBuffer = "";
+    }
+}
+/* =====================================================
+   START EMULATOR
+===================================================== */
+function startEmulator() {
+    log(
+        "Starting Windows 95 emulator...",
+        "boot"
+    );
+    setStatus(
+        "STARTING",
+        "boot"
+    );
+    /*
+     * Make sure libv86.js loaded.
+     */
+    if (
+        typeof V86 === "undefined"
+    ) {
         log(
-            "Waiting for BIOS / disk boot...",
+            "V86 was not found.",
+            "error"
+        );
+        log(
+            "Check that ./libv86.js exists and loaded correctly.",
+            "error"
+        );
+        setStatus(
+            "V86 MISSING",
+            "error"
+        );
+        return;
+    }
+    log(
+        "v86 library detected.",
+        "success"
+    );
+    try {
+        log(
+            "Creating V86 instance...",
             "boot"
         );
-
-    } catch (error) {
-
+        emulator = new V86({
+            /* =====================
+               V86 WASM
+            ===================== */
+            wasm_path:
+                "./v86.wasm",
+            /* =====================
+               DISPLAY
+            ===================== */
+            screen_container:
+                document.getElementById(
+                    "screen"
+                ),
+            /* =====================
+               BIOS
+            ===================== */
+            bios: {
+                url: "./seabios.bin"
+            },
+            vga_bios: {
+                url: "./vgabios.bin"
+            },
+            /* =====================
+               HARD DRIVE
+            ===================== */
+            hda: {
+                url: "./win95.img",
+                async: true
+            },
+            /* =====================
+               MEMORY
+            ===================== */
+            memory_size:
+                128 * 1024 * 1024,
+            vga_memory_size:
+                8 * 1024 * 1024,
+            /* =====================
+               SERIAL
+            ===================== */
+            serial_container:
+                document.getElementById(
+                    "logs"
+                ),
+            /* =====================
+               START
+            ===================== */
+            autostart: true,
+            /* =====================
+               MOUSE
+            ===================== */
+            disable_mouse: false
+        });
         log(
-            `Failed to create emulator: ${error.stack || error}`,
+            "V86 instance created.",
+            "success"
+        );
+        setStatus(
+            "BOOTING",
+            "boot"
+        );
+        /*
+         * Serial output.
+         */
+        emulator.add_listener(
+            "serial0-output-byte",
+            handleSerialByte
+        );
+        /*
+         * Emulator ready.
+         */
+        emulator.add_listener(
+            "emulator-ready",
+            function() {
+                log(
+                    "Emulator ready.",
+                    "success"
+                );
+                setStatus(
+                    "READY",
+                    "success"
+                );
+            }
+        );
+        /*
+         * Emulator started.
+         */
+        emulator.add_listener(
+            "emulator-started",
+            function() {
+                log(
+                    "Emulator started.",
+                    "success"
+                );
+                setStatus(
+                    "RUNNING",
+                    "success"
+                );
+            }
+        );
+        /*
+         * Emulator stopped.
+         */
+        emulator.add_listener(
+            "emulator-stopped",
+            function() {
+                log(
+                    "Emulator stopped.",
+                    "warning"
+                );
+                setStatus(
+                    "STOPPED",
+                    "warning"
+                );
+            }
+        );
+        /*
+         * Disk download progress.
+         */
+        emulator.add_listener(
+            "download-progress",
+            function(event) {
+                if (!event) {
+                    return;
+                }
+                const loaded =
+                    event.loaded || 0;
+                const total =
+                    event.total || 0;
+                if (total > 0) {
+                    const percent =
+                        (
+                            loaded /
+                            total *
+                            100
+                        ).toFixed(1);
+                    log(
+                        "Disk loading: " +
+                        percent +
+                        "%",
+                        "boot"
+                    );
+                }
+            }
+        );
+        log(
+            "Waiting for BIOS and Windows 95 boot...",
+            "boot"
+        );
+    } catch (error) {
+        log(
+            "Failed to start V86:",
             "error"
         );
-
-        setStatus("FAILED", "error");
-
+        log(
+            error.stack ||
+            String(error),
+            "error"
+        );
+        setStatus(
+            "FAILED",
+            "error"
+        );
     }
 }
-
-
-/* --------------------------------------------------
- * Restart
- * -------------------------------------------------- */
-
+/* =====================================================
+   RESTART
+===================================================== */
 function restartEmulator() {
-
-    log("Restart requested.", "warning");
-
+    log(
+        "Restart requested.",
+        "warning"
+    );
     try {
-
         if (emulator) {
-
-            log("Stopping current emulator...", "boot");
-
+            log(
+                "Stopping emulator...",
+                "boot"
+            );
             emulator.stop();
-
             emulator = null;
         }
-
     } catch (error) {
-
         log(
-            `Error stopping emulator: ${error}`,
+            "Error stopping emulator: " +
+            error,
             "error"
         );
     }
-
-    document.getElementById("screen").innerHTML = "";
-
-    setTimeout(() => {
-
-        log("Starting emulator again...", "boot");
-
-        startEmulator();
-
-    }, 500);
+    document
+        .getElementById("screen")
+        .innerHTML = "";
+    serialBuffer = "";
+    setStatus(
+        "RESTARTING",
+        "boot"
+    );
+    setTimeout(
+        function() {
+            startEmulator();
+        },
+        500
+    );
 }
-
-
-/* --------------------------------------------------
- * Debug command input
- * -------------------------------------------------- */
-
+/* =====================================================
+   COMMANDS
+===================================================== */
 function runCommand() {
-
-    const command =
-        commandInput.value.trim();
-
-    if (!command) return;
-
-    log(`> ${command}`, "info");
-
-    commandInput.value = "";
-
-    /*
-     * These are local debug commands.
-     */
-
-    switch (command.toLowerCase()) {
-
+    const input =
+        command.value.trim();
+    if (!input) {
+        return;
+    }
+    log(
+        "> " + input,
+        "info"
+    );
+    command.value = "";
+    switch (
+        input.toLowerCase()
+    ) {
         case "help":
             log(
-                "Commands: help, status, restart, clear",
+                "Available commands:",
+                "info"
+            );
+            log(
+                "help",
+                "info"
+            );
+            log(
+                "status",
+                "info"
+            );
+            log(
+                "restart",
+                "info"
+            );
+            log(
+                "clear",
                 "info"
             );
             break;
-
         case "status":
-
             if (emulator) {
                 log(
-                    "Emulator object exists.",
+                    "V86 instance exists.",
                     "success"
                 );
             } else {
                 log(
-                    "Emulator object does not exist.",
+                    "No V86 instance.",
                     "warning"
                 );
             }
-
             break;
-
         case "restart":
             restartEmulator();
             break;
-
         case "clear":
             clearLogs();
             break;
-
         default:
             log(
-                `Unknown debug command: ${command}`,
+                "Unknown command: " +
+                input,
                 "warning"
             );
     }
 }
-
-commandInput.addEventListener("keydown", event => {
-
-    if (event.key === "Enter") {
-        runCommand();
+command.addEventListener(
+    "keydown",
+    function(event) {
+        if (
+            event.key === "Enter"
+        ) {
+            runCommand();
+        }
     }
-
-});
-
-
-/* --------------------------------------------------
- * Initial boot
- * -------------------------------------------------- */
-
-log("----------------------------------------", "boot");
-log("Windows95emu debug launcher", "boot");
-log("Initializing...", "boot");
-log("----------------------------------------", "boot");
-
+);
+/* =====================================================
+   INITIAL BOOT LOG
+===================================================== */
+log(
+    "========================================",
+    "boot"
+);
+log(
+    "Windows95emu debug launcher",
+    "boot"
+);
+log(
+    "Initializing browser emulator...",
+    "boot"
+);
+log(
+    "========================================",
+    "boot"
+);
+/* =====================================================
+   START
+===================================================== */
 startEmulator();
-
 </script>
-
 </body>
 </html>
+
+Your repo should have these beside index.html
+
+Windows95emu/
+├── index.html
+├── libv86.js
+├── v86.wasm
+├── seabios.bin
+├── vgabios.bin
+└── win95.img
+
+The important correction is that this uses:
+
+new V86(...)
+
+instead of:
+
+new V86Starter(...)
+
+and it loads:
+
+wasm_path: "./v86.wasm"
+
+It also listens for:
+
+serial0-output-byte
+
+so if the guest actually sends serial output, it’ll appear in the debug panel.
