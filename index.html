@@ -3,173 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 95 Emulator - Debug</title>
+    <title>FreeDOS Emulator</title>
     <style>
-        * {
-            box-sizing: border-box;
+        :root {
+            color-scheme: dark;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background: #080909;
+            color: #a1a7a9;
+            --line: #1a1d1e;
+            --muted: #72797b;
+            --accent: #41484a;
+            --console: #090a0a;
         }
-        html,
-        body {
-            margin: 0;
+        * { box-sizing: border-box; }
+        html, body {
             width: 100%;
             height: 100%;
-            background: #101010;
-            color: #eee;
-            font-family: monospace;
+            margin: 0;
             overflow: hidden;
         }
+        body {
+            background: #080909;
+        }
+        button, input { font: inherit; }
+        button {
+            min-height: 34px;
+            padding: 0 11px;
+            border: 1px solid #1c2021;
+            border-radius: 3px;
+            background: #0d0f10;
+            color: #a1a7a9;
+            cursor: pointer;
+            transition: background-color 120ms ease, border-color 120ms ease;
+        }
+        button:hover { background: #151819; border-color: #353b3d; }
+        button:focus-visible, input:focus-visible {
+            outline: 2px solid #777f82;
+            outline-offset: 2px;
+        }
         #app {
+            display: flex;
             width: 100%;
             height: 100%;
-            display: flex;
+            padding: 8px;
+            gap: 8px;
         }
-        /* =========================
-           EMULATOR
-        ========================= */
-        #emulator-panel {
-            flex: 1;
+        #emulator-panel, #debug-panel {
             min-width: 0;
-            display: flex;
-            flex-direction: column;
-            background: #000;
+            overflow: hidden;
+            border: 1px solid #171a1b;
+            border-radius: 3px;
         }
-        #topbar {
-            height: 38px;
-            flex-shrink: 0;
+        #emulator-panel {
             display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            background: #090c0e;
+        }
+        #topbar, #debug-topbar {
+            display: flex;
+            min-height: 48px;
+            flex-shrink: 0;
             align-items: center;
-            padding: 0 10px;
-            background: #202020;
-            border-bottom: 1px solid #444;
-            font-size: 13px;
+            gap: 12px;
+            padding: 0 14px;
+            background: #0b0d0e;
+            border-bottom: 1px solid #191c1d;
         }
         #title {
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        #boot-disk-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+        #boot-disk {
+            min-height: 32px;
+            padding: 0 8px;
+            border: 1px solid #1c2021;
+            border-radius: 3px;
+            background: #0d0f10;
+            color: #a1a7a9;
+            font: inherit;
         }
         #status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
             margin-left: auto;
-            color: #aaa;
+            color: #777f82;
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            letter-spacing: 0.04em;
         }
+        #status::before {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #545b5d;
+            content: "";
+        }
+        #status.success::before { background: #647568; }
+        #status.warning::before { background: #77705c; }
+        #status.error::before { background: #795c59; }
+        #status.boot::before { background: #5e6b70; }
+        #terminal-toggle { white-space: nowrap; }
         #screen-container {
-            flex: 1;
             display: flex;
+            flex: 1;
+            min-height: 0;
             align-items: center;
             justify-content: center;
             overflow: auto;
-            background: #000;
+            padding: 18px;
+            background: #080909;
         }
         #screen {
+            max-width: 100%;
             background: #000;
+            white-space: pre;
+            font: 14px monospace;
+            line-height: 14px;
         }
-        /* =========================
-           DEBUG PANEL
-        ========================= */
+        #screen canvas {
+            max-width: 100%;
+            height: auto;
+        }
         #debug-panel {
-            width: 430px;
-            max-width: 43%;
             display: flex;
+            flex: 0 1 clamp(300px, 34vw, 440px);
             flex-direction: column;
-            background: #090909;
-            border-left: 1px solid #444;
+            background: var(--console);
         }
         #debug-topbar {
-            height: 38px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            padding: 0 8px;
-            background: #202020;
-            border-bottom: 1px solid #444;
+            min-height: 48px;
+            padding: 0 10px 0 14px;
+            background: #0b0d0e;
+            border-bottom-color: var(--line);
         }
         #debug-title {
-            font-weight: bold;
-            font-size: 13px;
+            color: #868e91;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
         }
-        #buttons {
-            margin-left: auto;
-            display: flex;
-            gap: 5px;
-        }
-        button {
-            background: #292929;
-            color: #eee;
-            border: 1px solid #555;
-            padding: 4px 8px;
-            font-family: monospace;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #3a3a3a;
-        }
-        /* =========================
-           LOG
-        ========================= */
+        #buttons { display: flex; gap: 6px; margin-left: auto; }
+        #buttons button { min-height: 30px; padding: 0 9px; font-size: 12px; }
         #logs {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
-            padding: 8px;
+            padding: 13px 14px;
+            color: #92999b;
+            font-family: "Courier New", monospace;
             font-size: 12px;
-            line-height: 1.45;
+            line-height: 1.55;
             white-space: pre-wrap;
             word-break: break-word;
         }
-        .log {
-            margin-bottom: 2px;
-        }
-        .info {
-            color: #ccc;
-        }
-        .boot {
-            color: #6db7ff;
-        }
-        .success {
-            color: #7cff7c;
-        }
-        .warning {
-            color: #ffd166;
-        }
-        .error {
-            color: #ff6666;
-        }
-        .serial {
-            color: #aaa;
-        }
-        /* =========================
-           COMMAND BAR
-        ========================= */
+        .log { margin-bottom: 3px; }
+        .info { color: #92999b; }
+        .boot { color: #788286; }
+        .success { color: #829087; }
+        .warning { color: #91876d; }
+        .error { color: #a17b76; }
+        .serial { color: #747c7f; }
         #command-bar {
             display: flex;
-            gap: 6px;
-            padding: 6px;
-            border-top: 1px solid #444;
+            gap: 8px;
+            padding: 10px;
+            border-top: 1px solid var(--line);
+            background: #0b0d0e;
         }
         #command {
             flex: 1;
             min-width: 0;
-            padding: 6px;
-            background: #111;
-            color: #fff;
-            border: 1px solid #444;
-            outline: none;
-            font-family: monospace;
+            padding: 0 10px;
+            border: 1px solid #202526;
+            border-radius: 3px;
+            background: #090b0c;
+            color: #b0b6b8;
+            font-family: "Courier New", monospace;
         }
-        /* =========================
-           MOBILE
-        ========================= */
-        @media (max-width: 800px) {
-            #app {
-                flex-direction: column;
-            }
-            #emulator-panel {
-                height: 60%;
-            }
-            #debug-panel {
-                width: 100%;
-                max-width: none;
-                height: 40%;
-                border-left: none;
-                border-top: 1px solid #444;
-            }
+        #command::placeholder { color: #555d5f; }
+        #app.terminal-hidden #debug-panel { display: none; }
+        @media (max-width: 760px) {
+            #app { flex-direction: column; padding: 8px; gap: 8px; }
+            #emulator-panel { flex: 1 1 60%; }
+            #debug-panel { flex: 1 1 40%; }
+            #app.terminal-hidden #emulator-panel { flex: 1 1 100%; }
+            #screen-container { padding: 8px; }
+        }
+        @media (max-width: 420px) {
+            #topbar { gap: 8px; padding: 0 9px; }
+            #title { font-size: 13px; }
+            #boot-disk-label { gap: 4px; font-size: 10px; }
+            #boot-disk { max-width: 120px; padding: 0 5px; font-size: 11px; }
+            #topbar button { padding: 0 8px; font-size: 12px; }
+            #debug-topbar { padding: 0 8px; }
+            #debug-title { font-size: 10px; }
+            #buttons { gap: 4px; }
+            #buttons button { padding: 0 7px; font-size: 11px; }
         }
     </style>
 </head>
@@ -181,11 +219,27 @@
     <section id="emulator-panel">
         <div id="topbar">
             <span id="title">
-                Windows 95 Emulator
+                FreeDOS
             </span>
+            <label id="boot-disk-label" for="boot-disk">
+                Boot from
+                <select id="boot-disk" onchange="selectBootDisk()">
+                    <option value="freedos">FreeDOS</option>
+                    <option value="win95">Windows 95 setup floppy</option>
+                </select>
+            </label>
             <span id="status">
                 INITIALIZING
             </span>
+            <button
+                id="terminal-toggle"
+                type="button"
+                aria-controls="debug-panel"
+                aria-expanded="true"
+                onclick="toggleTerminal()"
+            >
+                Hide terminal
+            </button>
         </div>
         <div id="screen-container">
             <div id="screen"></div>
@@ -197,7 +251,7 @@
     <section id="debug-panel">
         <div id="debug-topbar">
             <span id="debug-title">
-                BOOT / DEBUG OUTPUT
+                EMULATOR LOG
             </span>
             <div id="buttons">
                 <button onclick="clearLogs()">
@@ -232,12 +286,17 @@
    GLOBALS
 ===================================================== */
 let emulator = null;
+let startRequest = 0;
 const logs =
     document.getElementById("logs");
 const status =
     document.getElementById("status");
 const command =
     document.getElementById("command");
+const bootDiskSelect =
+    document.getElementById("boot-disk");
+const title =
+    document.getElementById("title");
 /* =====================================================
    LOGGING
 ===================================================== */
@@ -261,6 +320,17 @@ function clearLogs() {
     log(
         "Debug output cleared.",
         "info"
+    );
+}
+function toggleTerminal() {
+    const app = document.getElementById("app");
+    const toggle = document.getElementById("terminal-toggle");
+    const isHidden = app.classList.toggle("terminal-hidden");
+    toggle.textContent =
+        isHidden ? "Show terminal" : "Hide terminal";
+    toggle.setAttribute(
+        "aria-expanded",
+        String(!isHidden)
     );
 }
 /* =====================================================
@@ -355,9 +425,21 @@ function handleSerialByte(byte) {
 /* =====================================================
    START EMULATOR
 ===================================================== */
-function startEmulator() {
+async function startEmulator() {
+    const request =
+        ++startRequest;
+    const bootDisk =
+        bootDiskSelect.value;
+    const bootDiskName =
+        bootDisk === "win95"
+            ? "Windows 95 setup floppy"
+            : "FreeDOS";
+    title.textContent =
+        bootDiskName;
     log(
-        "Starting Windows 95 emulator...",
+        "Starting emulator with " +
+        bootDiskName +
+        " as drive A: and Windows 95 CD attached...",
         "boot"
     );
     setStatus(
@@ -389,6 +471,52 @@ function startEmulator() {
         "success"
     );
     try {
+        const [freedosResponse, windows95Response] =
+            await Promise.all([
+                fetch("./freedos.img"),
+                fetch("./win95.img")
+            ]);
+        if (!freedosResponse.ok) {
+            throw new Error(
+                "FreeDOS image request failed: " +
+                freedosResponse.status
+            );
+        }
+        if (!windows95Response.ok) {
+            throw new Error(
+                "Windows 95 setup floppy request failed: " +
+                windows95Response.status
+            );
+        }
+        const [freedosBuffer, windows95Buffer] =
+            await Promise.all([
+                freedosResponse.arrayBuffer(),
+                windows95Response.arrayBuffer()
+            ]);
+        if (request !== startRequest) {
+            return;
+        }
+        const bootBuffer =
+            bootDisk === "win95"
+                ? windows95Buffer
+                : freedosBuffer;
+        const secondaryBuffer =
+            bootDisk === "win95"
+                ? freedosBuffer
+                : windows95Buffer;
+        log(
+            "FreeDOS and Windows 95 setup floppy images loaded.",
+            "success"
+        );
+        log(
+            bootDiskName +
+            " is drive A:; the other floppy is drive B:.",
+            "info"
+        );
+        log(
+            "Windows 95 installation CD will be connected as a virtual CD-ROM.",
+            "info"
+        );
         log(
             "Creating V86 instance...",
             "boot"
@@ -416,10 +544,16 @@ function startEmulator() {
                 url: "./vgabios.bin"
             },
             /* =====================
-               HARD DRIVE
+               FLOPPY DRIVE
             ===================== */
-            hda: {
-                url: "./win95.img",
+            fda: {
+                buffer: bootBuffer
+            },
+            fdb: {
+                buffer: secondaryBuffer
+            },
+            cdrom: {
+                url: "./windows95.iso",
                 async: true
             },
             /* =====================
@@ -538,10 +672,15 @@ function startEmulator() {
             }
         );
         log(
-            "Waiting for BIOS and Windows 95 boot...",
+            "Waiting for " +
+            bootDiskName +
+            " boot...",
             "boot"
         );
     } catch (error) {
+        if (request !== startRequest) {
+            return;
+        }
         log(
             "Failed to start V86:",
             "error"
@@ -561,6 +700,7 @@ function startEmulator() {
    RESTART
 ===================================================== */
 function restartEmulator() {
+    startRequest += 1;
     log(
         "Restart requested.",
         "warning"
@@ -573,6 +713,17 @@ function restartEmulator() {
             );
             emulator.stop();
             emulator = null;
+        }
+        function selectBootDisk() {
+            log(
+                "Boot image changed to " +
+                bootDiskSelect.options[
+                    bootDiskSelect.selectedIndex
+                ].text +
+                ".",
+                "info"
+            );
+            restartEmulator();
         }
     } catch (error) {
         log(
@@ -680,7 +831,7 @@ log(
     "boot"
 );
 log(
-    "Windows95emu debug launcher",
+    "FreeDOS browser emulator",
     "boot"
 );
 log(
