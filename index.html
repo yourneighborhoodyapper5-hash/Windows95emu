@@ -698,31 +698,3 @@ startEmulator();
 </script>
 </body>
 </html>
-
-Your repo should have these beside index.html
-
-Windows95emu/
-├── index.html
-├── libv86.js
-├── v86.wasm
-├── seabios.bin
-├── vgabios.bin
-└── win95.img
-
-The important correction is that this uses:
-
-new V86(...)
-
-instead of:
-
-new V86Starter(...)
-
-and it loads:
-
-wasm_path: "./v86.wasm"
-
-It also listens for:
-
-serial0-output-byte
-
-so if the guest actually sends serial output, it’ll appear in the debug panel.
