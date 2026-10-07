@@ -439,7 +439,7 @@ async function startEmulator() {
     log(
         "Starting emulator with " +
         bootDiskName +
-        " as drive A: and Windows 95 CD attached...",
+        " as drive A:...",
         "boot"
     );
     setStatus(
@@ -474,7 +474,7 @@ async function startEmulator() {
         const [freedosResponse, windows95Response] =
             await Promise.all([
                 fetch("./freedos.img"),
-                fetch("./win95.img")
+                fetch("./win95bootdisk.img")
             ]);
         if (!freedosResponse.ok) {
             throw new Error(
@@ -514,7 +514,7 @@ async function startEmulator() {
             "info"
         );
         log(
-            "Windows 95 installation CD will be connected as a virtual CD-ROM.",
+            "Booting from the floppy drive.",
             "info"
         );
         log(
@@ -547,15 +547,20 @@ async function startEmulator() {
                FLOPPY DRIVE
             ===================== */
             fda: {
-                buffer: bootBuffer
+                buffer: bootBuffer,
+                drive_type:
+                    bootDisk === "win95"
+                        ? 4
+                        : 2
             },
             fdb: {
-                buffer: secondaryBuffer
+                buffer: secondaryBuffer,
+                drive_type:
+                    bootDisk === "win95"
+                        ? 2
+                        : 4
             },
-            cdrom: {
-                url: "./windows95.iso",
-                async: true
-            },
+            boot_order: 0x123,
             /* =====================
                MEMORY
             ===================== */
